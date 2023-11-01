@@ -1,24 +1,54 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+const timeDisplay = document.querySelector("#timeDisplay");
+const startBtn = document.querySelector("#startBtn");
+const pauseBtn = document.querySelector("#pauseBtn");
+const resetBtn = document.querySelector("#resetBtn");
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+let startTime = 0;
+let elapsedTime = 0;
+let currentTime = 0;
+let pause = true;
+let intervalId;
+let hrs = 0;
+let mins = 0;
+let secs = 0;
 
-setupCounter(document.querySelector('#counter'))
+startBtn.addEventListener("click", () => {
+  if (pause) {
+    pause = false;
+    startTime = Date.now() - elapsedTime;
+    intervalId = setInterval(updateTime, 100);
+  }
+});
+pauseBtn.addEventListener("click", () => {
+  if (!pause) {
+    pause = true;
+    elapsedTime = Date.now() - startTime;
+    clearInterval(intervalId);
+  }
+});
+resetBtn.addEventListener("click", () => {
+  pause = true;
+  clearInterval(intervalId);
+  startTime = 0;
+  elapsedTime = 0;
+  currentTime = 0;
+  hrs = 0;
+  mins = 0;
+  secs = 0;
+  timeDisplay.textContent = "00:00:00";
+});
+
+function updateTime() {
+  elapsedTime = Date.now() - startTime;
+  secs = Math.floor((elapsedTime / 1000) % 60);
+  mins = Math.floor((elapsedTime / (1000 * 60)) % 60);
+  hrs = Math.floor((elapsedTime / (1000 * 60 * 60)) % 60);
+  secs = pad(secs);
+  mins = pad(mins);
+  hrs = pad(hrs);
+
+  timeDisplay.textContent = `${hrs}:${mins}:${secs}`;
+  function pad(unit) {
+    return ("0" + unit).length > 2 ? unit : "0" + unit;
+  }
+}
